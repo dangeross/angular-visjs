@@ -17,6 +17,7 @@ angular.module('ngVis', [])
             restrict: 'EA',
             transclude: false,
             scope: {
+                customTime: '=',
                 data: '=',
                 options: '=',
                 events: '='
@@ -63,6 +64,25 @@ angular.module('ngVis', [])
                         angular.isFunction(scope.events.onload)) {
                         scope.events.onload(timeline);
                     }
+
+                    // set custom time
+                    angular.forEach(scope.customTime, function (time, id) {
+                        timeline.addCustomTime(time, id);
+                    });
+                });
+
+                scope.$watchCollection('customTime', function (newCustomTime, oldCustomTime) {
+                    if (timeline == null) {
+                        return;
+                    }
+
+                    angular.forEach(oldCustomTime, function (time, id) {
+                        timeline.removeCustomTime(id);
+                    });
+
+                    angular.forEach(scope.customTime, function (time, id) {
+                        timeline.addCustomTime(time, id);
+                    });
                 });
 
                 scope.$watchCollection('options', function (options) {
@@ -90,7 +110,7 @@ angular.module('ngVis', [])
             link: function (scope, element, attr) {
                 var networkEvents = [
                     'click',
-                    'doubleClick',
+                    'doubleclick',
                     'oncontext',
                     'hold',
                     'release',
